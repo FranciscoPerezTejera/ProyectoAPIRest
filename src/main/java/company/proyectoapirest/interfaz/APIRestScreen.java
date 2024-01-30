@@ -3,7 +3,6 @@ package company.proyectoapirest.interfaz;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import company.proyectoapirest.dto.ItemDTO;
 import company.proyectoapirest.dto.MoveDTO;
 import company.proyectoapirest.dto.PokemonDTO;
@@ -116,7 +115,7 @@ public class APIRestScreen extends javax.swing.JFrame {
 
                 gson = new Gson();
 
-                resultado = cliente.getPokemonsByNameWithQueryParams("?offset=49");
+                resultado = cliente.getPokemonsByNameWithQueryParams("?offset=40&limit=50");
 
                 JsonObject jsonObject = gson.fromJson(resultado, JsonObject.class);
                 JsonArray resultsArray = jsonObject.getAsJsonArray("results");
