@@ -1,6 +1,5 @@
 package company.proyectoapirest.dto;
 
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -14,18 +13,55 @@ public class RestClient {
     public String getPokemons() {
         return sendGetRequest("pokemon");
     }
-
-    public String getPokemonsByIDWithQueryParams(String id) {
-        return sendGetRequestWithQueryParams("pokemon/", id);
+    
+    public String getMove() {
+        return sendGetRequest("move");
+    }
+    
+    public String getItem() {
+        return sendGetRequest("item");
     }
 
+    public String getPokemonsByNameWithQueryParams(String name) {
+        return sendGetRequestWithQueryParams("pokemon/", name);
+    }
+    
+        public String getItemsWithQueryParams(String queryOne, String queryTwo) {
+        return sendGetRequestWithQueryParams("pokemon", queryOne + queryTwo);
+    }
+    
+    public String getMovesLimit(String limit) {
+        return sendGetRequestPokemonsLimit("move", limit);
+    }
+    
+    public String getItemsLimit(String limit) {
+        return sendGetRequestPokemonsLimit("item", limit);
+    }
+    
     public String getPokemonsLimit(String limit) {
-        return sendGetRequestPokemonsLimit("pokemon/", limit);
+        return sendGetRequestPokemonsLimit("pokemon", limit);
     }
-    private String sendGetRequestWithQueryParams(String endpoint, String id) {
+    
+    
+    private String sendGetRequestWithQueryParams(String endpoint, String query) {
         try {
             CloseableHttpClient httpClient = HttpClients.createDefault();
-            HttpGet request = new HttpGet(URL_API + endpoint + id);
+            HttpGet request = new HttpGet(URL_API + endpoint + query);
+            request.setHeader("Content-Type", "application/json");
+
+            CloseableHttpResponse response = httpClient.execute(request);
+            return extractResponseContent(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+        private String sendGetRequestWithTwoQueryParams(String endpoint, String querOne, String queryTwo) {
+        try {
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            HttpGet request = new HttpGet(URL_API + endpoint + "?limit=" + querOne + "&sort_by=" + queryTwo);
             request.setHeader("Content-Type", "application/json");
 
             CloseableHttpResponse response = httpClient.execute(request);

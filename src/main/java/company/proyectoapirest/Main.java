@@ -10,33 +10,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 public class Main {
 
     public static void main(String[] args) {
-        
-        
-        APIRestScreen nuevaAPIRestScreen;
-        RestClient cliente = new RestClient();
 
-        String pokemons = cliente.getPokemonsLimit("151");
+        RestClient cliente = new RestClient();
+        String resultado = "";
+
+        resultado = cliente.getPokemonsLimit("151");
 
         Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(pokemons, JsonObject.class);
+
+        JsonObject jsonObject = gson.fromJson(resultado, JsonObject.class);
         JsonArray resultsArray = jsonObject.getAsJsonArray("results");
 
-        List<PokemonDTO> pokemones = Arrays.asList(gson.fromJson(resultsArray, PokemonDTO[].class));
-        List <String> nombresPokemon = new ArrayList<>();
-       // List <PokemonDTO> listaDenombre = p
+        List<PokemonDTO> listaDePokemons = Arrays.asList(gson.fromJson(resultsArray, PokemonDTO[].class));
 
-        for (PokemonDTO pokemon : pokemones) {
-          //  nombresPokemon.add(pokemon.getName());
+        List<String> lista = new ArrayList<String>();
+
+        for (PokemonDTO pokemon : listaDePokemons) {
+            lista.add(pokemon.getName());
         }
-        
-        for (String string : nombresPokemon) {
-            System.out.println(string);
-        }
-        
-        nuevaAPIRestScreen = new APIRestScreen(pokemones);
+
+        APIRestScreen nuevaAPIRestScreen = new APIRestScreen(lista);
     }
 }

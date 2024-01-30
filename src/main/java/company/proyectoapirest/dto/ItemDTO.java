@@ -1,14 +1,14 @@
 package company.proyectoapirest.dto;
 
-public class PokemonDTO {
+public class ItemDTO {
 
     public String name;
     public String url;
 
-    public PokemonDTO() {
+    public ItemDTO() {
     }
 
-    public PokemonDTO(String name, String url) {
+    public ItemDTO(String name, String url) {
         this.name = name;
         this.url = url;
     }
@@ -31,6 +31,6 @@ public class PokemonDTO {
 
     @Override
     public String toString() {
-        return "Pokemon [" + "Nombre : " + name + ", URL de información: " + url + ']';
+        return "Objeto [" + "Nombre: " + name + ", URL de información: " + url + ']';
     }
 }
