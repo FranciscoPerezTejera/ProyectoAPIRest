@@ -12,14 +12,14 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import javax.swing.JOptionPane;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 public class APIRestScreen extends javax.swing.JFrame {
@@ -143,8 +143,6 @@ public class APIRestScreen extends javax.swing.JFrame {
 
                 resultado = cliente.getItemsLimit("100");
 
-                System.out.println(resultado);
-
                 JsonObject jsonObject = gson.fromJson(resultado, JsonObject.class);
                 JsonArray resultsArray = jsonObject.getAsJsonArray("results");
 
@@ -199,6 +197,9 @@ public class APIRestScreen extends javax.swing.JFrame {
         areaTextoCarta = new javax.swing.JTextArea();
         operacionPostEnviarButton = new javax.swing.JButton();
         borrarContenidoButton = new javax.swing.JButton();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        respuestaDelPost = new javax.swing.JTextArea();
+        jLabel10 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -367,10 +368,13 @@ public class APIRestScreen extends javax.swing.JFrame {
         jLabel8.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jLabel8.setText("Título de la carta:");
 
+        tituloCartaTextField.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+
         jLabel9.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jLabel9.setText("Cuerpo de la carta:");
 
         areaTextoCarta.setColumns(20);
+        areaTextoCarta.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         areaTextoCarta.setRows(5);
         jScrollPane4.setViewportView(areaTextoCarta);
 
@@ -387,6 +391,14 @@ public class APIRestScreen extends javax.swing.JFrame {
                 borrarContenidoButtonActionPerformed(evt);
             }
         });
+
+        respuestaDelPost.setColumns(20);
+        respuestaDelPost.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        respuestaDelPost.setRows(5);
+        jScrollPane5.setViewportView(respuestaDelPost);
+
+        jLabel10.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel10.setText("Respuesta del POST:");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -407,15 +419,15 @@ public class APIRestScreen extends javax.swing.JFrame {
                                 .addComponent(borrarContenidoButton))
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                                        .addComponent(jLabel9)
-                                        .addGap(18, 18, 18))
-                                    .addGroup(jPanel2Layout.createSequentialGroup()
-                                        .addComponent(jLabel8)
-                                        .addGap(31, 31, 31)))
+                                    .addComponent(jLabel8)
+                                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel9)))
+                                .addGap(18, 18, 18)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(tituloCartaTextField)
-                                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 567, Short.MAX_VALUE))))
+                                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 567, Short.MAX_VALUE)
+                                    .addComponent(jScrollPane5))))
                         .addGap(38, 38, 38))))
         );
         jPanel2Layout.setVerticalGroup(
@@ -430,12 +442,19 @@ public class APIRestScreen extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel9)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(28, 28, 28)
+                        .addComponent(jLabel10)))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(borrarContenidoButton)
                     .addComponent(operacionPostEnviarButton))
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("POST API REST", jPanel2);
@@ -456,34 +475,64 @@ public class APIRestScreen extends javax.swing.JFrame {
 
     private void operacionPostEnviarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operacionPostEnviarButtonActionPerformed
 
-        try {
-            CloseableHttpClient client = HttpClients.createDefault();
-            HttpPost httpPost = new HttpPost("https://jsonplaceholder.typicode.com/posts");
-            
+        if (tituloCartaTextField.getText().isEmpty() && areaTextoCarta.getText().isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    null,
+                    "LOS CAMPOS NO PUEDEN ESTAR VACIOS",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        } else {
+
+            Gson gson = new Gson();
             JSONObject objeto = new JSONObject();
-            objeto.accumulate("userId", 1);
+            CloseableHttpClient cliente = null;
+            HttpPost httpPost = null;
+
             objeto.accumulate("title", tituloCartaTextField.getText());
             objeto.accumulate("body", areaTextoCarta.getText());
-            
-            StringEntity entidad = new StringEntity(objeto.toString(), StandardCharsets.UTF_8);
-            httpPost.setEntity(entidad);
-            
-            httpPost.setHeader("Accept", "application/json");
-            httpPost.setHeader("Content-type", "application/json; charset=UTF-8");
-            
-            CloseableHttpResponse response = client.execute(httpPost);
-            System.out.println(response.toString());
-        } catch (IOException ex) {
-            
+            objeto.accumulate("userId", 4);
+
+            String jsonPost = gson.toJson(objeto);
+
+            try {
+                cliente = HttpClients.createDefault();
+                httpPost = new HttpPost("https://jsonplaceholder.typicode.com/posts");
+                httpPost.setHeader("Content-Type", "application/json");
+
+                StringEntity requestEntity = new StringEntity(jsonPost);
+
+                httpPost.setEntity(requestEntity);
+            } catch (Exception e) {
+
+            }
+            try {
+                CloseableHttpResponse response = cliente.execute(httpPost);
+
+                HttpEntity responseEntity = response.getEntity();
+
+                if (responseEntity != null) {
+
+                    String respuesta = EntityUtils.toString(responseEntity);
+                    respuestaDelPost.setText(respuesta);
+
+                } else {
+                    JOptionPane.showMessageDialog(this, "FALLO EN LA RESPUESTA");
+                }
+                
+                cliente.close();
+                
+            } catch (Exception e) {
+            }
         }
-
-
     }//GEN-LAST:event_operacionPostEnviarButtonActionPerformed
 
     private void borrarContenidoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrarContenidoButtonActionPerformed
 
         tituloCartaTextField.setText("");
         areaTextoCarta.setText("");
+        respuestaDelPost.setText("");
 
     }//GEN-LAST:event_borrarContenidoButtonActionPerformed
 
@@ -494,6 +543,7 @@ public class APIRestScreen extends javax.swing.JFrame {
     private javax.swing.JTextArea areaTextoCarta;
     private javax.swing.JButton borrarContenidoButton;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -510,11 +560,13 @@ public class APIRestScreen extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JComboBox<String> nombrePokemonsComboBox;
     private javax.swing.JComboBox<String> nombreRecursoComboBox;
     private javax.swing.JButton operacionPostEnviarButton;
     private javax.swing.JComboBox<String> queryParamsComboBox;
+    private javax.swing.JTextArea respuestaDelPost;
     private javax.swing.JTextField tituloCartaTextField;
     // End of variables declaration//GEN-END:variables
 }
